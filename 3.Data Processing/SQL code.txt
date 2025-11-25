@@ -1,0 +1,77 @@
+--EDA
+
+---checking headers
+SELECT * FROM `workspace`.`default`.`car_sales` limit 10;
+
+---checking number of rows
+select count(*) as NumberOfRows from car_sales;
+
+select distinct transmission from car_sales;
+
+select distinct count(vin) as NumberOfRows from car_sales;
+
+---checking number of distinct rows
+select distinct count (*) as numberOfColumns from car_sales;
+
+---checking highest and lowest odemeter reading (1-999,999)
+select min(odometer) as MinOdometer, max(odometer) as MaxOdometer from car_sales;
+
+--grouping cars by km's
+select odometer, 
+case
+when odometer < 1000 then '1. New (0-1000 km)'
+when odometer between 1000 and 10000 then '2. Demo (1000-10000 km)'
+when odometer between 10000 and 30000 then '3. New Second Hand (10000-30000 km)'
+when odometer between 30000 and 100000 then '4. Second Hand (30000-100000 km)'
+else '5. Used (100000+ km)'
+end as OdometerGroup
+from car_sales;
+
+---sold above or below market value
+select mmr, sellingprice,
+case
+when mmr > sellingprice then 'Sold Below Market Value'
+when mmr < sellingprice then 'Sold Above Market Value'
+else 'Sold At Market Value'
+end as GainsOrLoss
+from car_sales;
+
+---checking nulls
+select * from car_sales where year is null or make is null or model is null or trim is null or body is null or transmission is null or vin is null or state is null or condition is null or odometer is null or color is null or interior is null or seller is null or mmr is null or sellingprice is null or saledate is null;
+
+select count(*)
+from car_sales
+where saledate is null;
+
+---removing nulls
+select ifnull(year, 0) as Year, ifnull(make,'Unknown') as Make, ifnull(model,'Unknown') as Model, ifnull(trim,'Unknown') as Trim, ifnull(body,'Unknown') as Body, ifnull(transmission,'Unknown') as Transmission, ifnull(vin, 'Unknown') as Vin, ifnull(state,'Unknown') as State, ifnull(condition, 0) as Condition, ifnull(odometer, 0) as Odometer, ifnull(color,'Unknown') as Color, ifnull(interior,'Unknown') as Interior, ifnull(seller,'Unknown') as Seller, ifnull(mmr, 0) as MMR, ifnull(sellingprice, 0) as SellingPrice, ifnull(saledate,'Not Sold') as SaleDate 
+from car_sales;
+
+---splitting codes
+
+select saledate, split_part(saledate,' ',1) as SaleDAYOFWEEK, split_part(saledate,' ',2) as SaleMONTH, split_part(saledate,' ',3) as SaleDAY, split_part(saledate,' ',4) as SaleYEAR
+from car_sales;
+
+---FINAL CODE
+select 
+  ifnull(year, 0) as Year, ifnull(make,'Unknown') as Make, ifnull(model,'Unknown') as Model, ifnull(trim,'Unknown') as Trim, ifnull(body,'Unknown') as Body, ifnull(transmission,'Unknown') as Transmission, ifnull(vin, 'Unknown') as Vin, ifnull(state,'Unknown') as State, ifnull(condition, 0) as Condition, ifnull(odometer, 0) as Odometer,
+    case
+      when odometer < 1000 then '1. New (0-1000 km)'
+      when odometer between 1000 and 10000 then '2. Demo (1000-10000 km)'
+      when odometer between 10000 and 30000 then '3. New Second Hand (10000-30000 km)'
+      when odometer between 30000 and 100000 then '4. Second Hand (30000-100000 km)'
+    else '5. Used (100000+ km)'
+    end as OdometerGroup,
+  ifnull(color,'Unknown') as Color, ifnull(interior,'Unknown') as Interior, ifnull(seller,'Unknown') as Seller, ifnull(mmr, 0) as MMR, ifnull(sellingprice, 0) as SellingPrice, 
+    case
+      when mmr > sellingprice then 'Sold Below Market Value'
+      when mmr < sellingprice then 'Sold Above Market Value'
+    else 'Sold At Market Value'
+    end as GainsOrLoss,
+  ifnull(saledate,'Not Sold') as SaleDate,
+    split_part(saledate,' ',1) as SaleDAYOFWEEK, split_part(saledate,' ',2) as SaleMONTH, split_part(saledate,' ',3) as SaleDAY, split_part(saledate,' ',4) as SaleYEAR,
+ifnull(saledayofweek,'Not sold'),
+ifnull(salemonth,'Not sold'),
+ifnull(saleday,'Not sold'),
+ifnull(saleyear,'Not sold')
+from car_sales;
